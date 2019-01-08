@@ -47,26 +47,34 @@ def detect_keywords(file_name):
 
 
 
-def transfer_file(file_name):
+def transfer_file(file_name_json):
     """ Transfere a json file from FROM_DIRECTORY_AUDIO to TO_DIRECTORY_AUDIO """
+
+    file_name_audio = json_to_audio(file_name_json)
     
     # Source file
     src = os.path.join(
             os.path.dirname(__file__),
             FROM_DIRECTORY_AUDIO,
-            file_name)
+            file_name_audio)
 
     # Destination file
     dst = os.path.join(
             os.path.dirname(__file__),
             TO_DIRECTORY_AUDIO,
-            file_name)
+            file_name_audio)
 
     # Copy file from source to destination
     shutil.copyfile(src, dst)
 
     # Print the success
     print('{} has been transfered successfully 🎉'.format(file_name))
+
+
+
+def json_to_audio(file_name):
+    """ Replaces .json by .mp3 """
+    return file_name.split('.json')[0] + '.mp3'
 
 
 
