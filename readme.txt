@@ -1,3 +1,19 @@
+08.01.2019
+
+Second iteration of the bootstrap for one of our client.
+
+First iteration is a uber simple push to talk todolist creator, on top of a regular talkie walkie like app. We also added another A to our name (don't ask. It sounds cooler.)
+
+Kraaft use the following components :
+1. Zello for the talkie walkie part
+2. Homemade component to get all zello files in a neatly organized folder in .RAW
+3. Google speech API to transform that to text
+4. Simple decision-based tree to parse for keyword (if keyword then todo, else nope)
+5. Wunderlist to recieve the filtered to do messages, and add the .MP3 of the todo to the card
+
+Cheers !
+
+-----------------------
 19.11.2018
 
 Very first bootstrap to test Kraft, our voice-enabled Slack for factories.
