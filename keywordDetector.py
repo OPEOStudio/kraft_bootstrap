@@ -12,9 +12,6 @@ keywords = ('carte', 'cartes', 'nouvelle carte', 'nouvelles cartes',
 FROM_DIRECTORY = "FROM_DIRECTORY"
 TO_DIRECTORY = "TO_DIRECTORY"
 
-file_name = 'test.json'
-
-
 
 def detect_keywords(file_name):
     """ Detects if a file contains trigger keywords """
@@ -103,7 +100,10 @@ def newFileScanner():
 
 
 
-newFileScanner()
+if __name__ == '__main__':
+    
+    # Scan new incoming files
+    newFileScanner()
 
 
 
