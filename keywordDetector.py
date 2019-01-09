@@ -91,11 +91,12 @@ def newFileScanner():
                 # extract the name of the json file
                 file_name_json = ntpath.basename(f)
 
-                # Replaces .json by .mp3
-                file_name_audio = file_name.split('.json')[0] + '.mp3'
 
                 # If a trigger keyword is detected in a file
                 if detect_keywords(file_name_json):
+                    
+                    # Replaces .json by .mp3
+                    file_name_audio = file_name_json.split('.json')[0] + '.mp3'
 
                     # Transfer the file to a new directory
                     transfer_file(file_name_audio)
