@@ -47,34 +47,26 @@ def detect_keywords(file_name):
 
 
 
-def transfer_file(file_name_json):
+def transfer_file(file_name):
     """ Transfere a json file from FROM_DIRECTORY_AUDIO to TO_DIRECTORY_AUDIO """
-
-    file_name_audio = json_to_audio(file_name_json)
     
     # Source file
     src = os.path.join(
             os.path.dirname(__file__),
             FROM_DIRECTORY_AUDIO,
-            file_name_audio)
+            file_name)
 
     # Destination file
     dst = os.path.join(
             os.path.dirname(__file__),
             TO_DIRECTORY_AUDIO,
-            file_name_audio)
+            file_name)
 
     # Copy file from source to destination
     shutil.copyfile(src, dst)
 
     # Print the success
     print('{} has been transfered successfully 🎉'.format(file_name))
-
-
-
-def json_to_audio(file_name):
-    """ Replaces .json by .mp3 """
-    return file_name.split('.json')[0] + '.mp3'
 
 
 
@@ -96,14 +88,17 @@ def newFileScanner():
 
             for f in added:
 
-                # extract the name of the file
-                file_name = ntpath.basename(f)
+                # extract the name of the json file
+                file_name_json = ntpath.basename(f)
+
+                # Replaces .json by .mp3
+                file_name_audio = file_name.split('.json')[0] + '.mp3'
 
                 # If a trigger keyword is detected in a file
-                if detect_keywords(file_name):
+                if detect_keywords(file_name_json):
 
                     # Transfer the file to a new directory
-                    transfer_file(file_name)
+                    transfer_file(file_name_audio)
 
         before = after
 
