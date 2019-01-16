@@ -6,7 +6,7 @@
 # - md5(Zello admin account password)
 
 # Calls zello_api_connect.py to get the API tokens (token & sid)
-# Calls password_hasher.py to get API connection password 
+# Calls password_hasher.py to get API connection password
 # --> md5(md5(Zello admin account password) + {token} + {API Key})
 # LOGINS to Zello API
 # GETs METADATA
@@ -26,9 +26,11 @@
 print(" ")
 
 import json
-from urllib import urlencode
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 import urllib
-import wget
 import requests
 import zello_api_connect
 from password_hasher import hash_md5
@@ -51,7 +53,7 @@ headers = {
 nbr_msg_to_check = "max=1"
 
 ### -----------------------------
-### GETS TOKENS: 
+### GETS TOKENS:
 gettoken_response = zello_api_connect.gettoken_zello(url = url_gettoken, headers = headers)
 
 token = gettoken_response["token"]
@@ -109,19 +111,23 @@ print("request media :" + request_media.text) # Prints the server response
 ## Extracts url containing file from the request body
 # Transforms json response into a dictionnary and extract the url field
 request_media_dict = json.loads(request_media.text)
+print('==== Request Media Dictionary ====')
+for key, value in request_media_dict.items():
+    print(key, value)
+print('==== END Request Media Dictionary ====')
 url_download = request_media_dict["url"]
 print("url_download = " + url_download)
 
-print("Beginning the download of the file...") 
+print("Beginning the download of the file...")
 ## Didn't make it work quite well...
 # urllib.request.urletrieve(url_download, "/Users/marcnegre/Documents/Kraaft/0. Bootstrap/0. Code/kraaft_poc_sodapem")
 # r = requests.get(url_download)
 # print(len(r.content))
-
 # urllib.urlretrieve(url_download)
 
-wget.download(url_download)
-
+file_handler = open('sound.mp3', 'wb')
+response = requests.get(url_download, data = {}, params = querystring)
+file_handler.write(response.content)
 
 
 
