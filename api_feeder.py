@@ -118,13 +118,8 @@ print('==== END Request Media Dictionary ====')
 url_download = request_media_dict["url"]
 print("url_download = " + url_download)
 
+## MP3 file download
 print("Beginning the download of the file...")
-## Didn't make it work quite well...
-# urllib.request.urletrieve(url_download, "/Users/marcnegre/Documents/Kraaft/0. Bootstrap/0. Code/kraaft_poc_sodapem")
-# r = requests.get(url_download)
-# print(len(r.content))
-# urllib.urlretrieve(url_download)
-
 file_handler = open('sound.mp3', 'wb')
 response = requests.get(url_download, data = {}, params = querystring)
 file_handler.write(response.content)
