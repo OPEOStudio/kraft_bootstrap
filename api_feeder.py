@@ -30,9 +30,11 @@ try:
     from urllib import urlencode
 except ImportError:
     from urllib.parse import urlencode
+import os
 import urllib
 import requests
 import zello_api_connect
+import last_message_id
 from password_hasher import hash_md5
 from print_request import print_r
 
@@ -49,8 +51,6 @@ headers = {
     'Content-Type': "application/x-www-form-urlencoded",
     'cache-control': "no-cache"
     }
-
-nbr_msg_to_check = "max=1"
 
 ### -----------------------------
 ### GETS TOKENS:
@@ -86,17 +86,7 @@ response = requests.request("POST", url_login, data = payload, headers = headers
 ### Print the request object for dev purposes
 print_r("POST", url_login, data = payload, headers = headers, params = querystring)
 
-### -----------------------------
-### DEFINE THE GET METADATA REQUEST
-### Request test to get the 1 last history metadata message
-# Don't know why, the max just doesn't work, I get 100 messages
-# I'll have to further select the first element of the list, no choice
-url_metada = url + "/history/getmetadata"
-request_metadata = requests.request("POST", url_metada, data = nbr_msg_to_check, params = querystring)
-# Print the request for dev purposes
-print_r("POST", url_metada, data = nbr_msg_to_check, headers = {}, params = querystring)
-
-print("request_metada : " + request_metadata.text)
+url_metadata = url + "/history/getmetadata"
 
 ### -----------------------------
 ### DOWNLOADS A DEFINED OBJECT
@@ -104,32 +94,49 @@ print("request_metada : " + request_metadata.text)
 media_key = "1901d582e2e467671680d73dfb4d5944ac6ba959240412e718f424154fa03c9d"
 url_media = url + "/history/getmedia/key/" + media_key
 
-request_media = requests.request("GET", url_media, data = "", headers ={}, params = querystring)
-print_r("GET", url_media, data = "", headers = {}, params = querystring)
+request_media = requests.request("GET", url_media, params = querystring)
 print("request media :" + request_media.text) # Prints the server response
 
 ## Extracts url containing file from the request body
 # Transforms json response into a dictionnary and extract the url field
 request_media_dict = json.loads(request_media.text)
-print('==== Request Media Dictionary ====')
-for key, value in request_media_dict.items():
-    print(key, value)
-print('==== END Request Media Dictionary ====')
-url_download = request_media_dict["url"]
+url_download = request_media_dict['url']
 print("url_download = " + url_download)
 
-## MP3 file download
-print("Beginning the download of the file...")
-file_handler = open('sound.mp3', 'wb')
-response = requests.get(url_download, data = {}, params = querystring)
-file_handler.write(response.content)
+## Last ID
+params = {}
+params['sid'] = sid
+params['sort'] = 'id'
+params['sort_order'] = 'ASC'
+params['max'] = 1
 
+#initialize the start_id parameter
+start_id = last_message_id.getLastMessageId()
 
+if start_id <= 1:
+    request_metadata = requests.get(url_metadata, params = params)
+    request_metadata_dict = json.loads(request_metadata.text)
+    last_message_id.saveLastMessageId(request_metadata_dict['messages'][0]['id'])
+    start_id = request_metadata_dict['messages'][0]['id']
+params['start_id'] = start_id
 
+del params['max']
 
+try:
+    while 1:
+        request_metadata = requests.get(url_metadata, params = params)
+        request_metadata_dict = json.loads(request_metadata.text)
+        messages = request_metadata_dict['messages']
 
+        if len(messages) <= 1:
+            continue
 
+        del messages[0]
 
-
-
-
+        # upload mp3 to TO JOIN folder in Google Docs
+        # translate with google speech api to text in json,
+        for message in messages:
+            params['start_id'] = message['id']
+except KeyboardInterrupt:
+    last_message_id.saveLastMessageId(params['start_id'])
+    print('interrupted')
