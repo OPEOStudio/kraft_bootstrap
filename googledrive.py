@@ -8,7 +8,7 @@ from google.auth.transport.requests import Request
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
 
-def googleDriveAuthenticate():
+def authenticate():
     # Google Drive Authentication
 
     creds = None
@@ -31,3 +31,6 @@ def googleDriveAuthenticate():
             pickle.dump(creds, token)
 
     return build('drive', 'v3', credentials=creds)
+
+def uploadFile():
+    print('upload to Google')

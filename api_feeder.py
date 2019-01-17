@@ -35,6 +35,7 @@ import urllib
 import requests
 import zello_api_connect
 import last_message_id
+import googledrive
 from password_hasher import hash_md5
 from print_request import print_r
 
@@ -122,6 +123,8 @@ params['start_id'] = start_id
 
 del params['max']
 
+googledrive_api = googledrive_authentication.authenticate();
+
 try:
     while 1:
         request_metadata = requests.get(url_metadata, params = params)
@@ -130,6 +133,7 @@ try:
 
         if len(messages) <= 1:
             continue
+        print(messages[0])
 
         del messages[0]
 
@@ -137,6 +141,7 @@ try:
         # translate with google speech api to text in json,
         for message in messages:
             params['start_id'] = message['id']
+            googledrive.upload();
 except KeyboardInterrupt:
     last_message_id.saveLastMessageId(params['start_id'])
     print('interrupted')
