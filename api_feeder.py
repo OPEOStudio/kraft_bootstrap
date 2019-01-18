@@ -37,7 +37,10 @@ import requests
 import zello_api_connect
 import last_message_id
 import googledrive
+import trelloApi
 import speech2text
+import keywordDetector
+from datetime import datetime
 from password_hasher import hash_md5
 from print_request import print_r
 
@@ -91,21 +94,6 @@ print_r("POST", url_login, data = payload, headers = headers, params = querystri
 
 url_metadata = url + "/history/getmetadata"
 
-### -----------------------------
-### DOWNLOADS A DEFINED OBJECT
-# Just a test with the media key of the last Zello message
-media_key = "1901d582e2e467671680d73dfb4d5944ac6ba959240412e718f424154fa03c9d"
-url_media = url + "/history/getmedia/key/" + media_key
-
-request_media = requests.request("GET", url_media, params = querystring)
-print("request media :" + request_media.text) # Prints the server response
-
-## Extracts url containing file from the request body
-# Transforms json response into a dictionnary and extract the url field
-request_media_dict = json.loads(request_media.text)
-url_download = request_media_dict['url']
-print("url_download = " + url_download)
-
 ## Last ID
 params = {}
 params['sid'] = sid
@@ -126,8 +114,10 @@ params['start_id'] = start_id
 del params['max']
 
 googledrive = googledrive.GoogleDrive();
+trello = trelloApi.TrelloAPI()
 
-file_handler = open('tmp.mp3', 'wb')
+file_handler_audio = open('tmp.mp3', 'wb')
+file_handler_json = open('tmp.json', 'w+')
 
 try:
     while 1:
@@ -144,7 +134,6 @@ try:
 
         # upload mp3 to TO JOIN folder in Google Docs
         # translate with google speech api to text in json,
-        print('in messages')
         for message in messages:
 
             print('download mp3')
@@ -152,23 +141,42 @@ try:
             url_media = url + "/history/getmedia/key/" + message['media_key']
             request_media = requests.get(url_media, params = querystring)
             request_media_dict = json.loads(request_media.text)
-            audio_file = requests.get(request_media_dict['url'], data = {}, params = querystring)
-
-            file_handler.write(audio_file.content)
+            try:
+                audio_file = requests.get(request_media_dict['url'], data = {}, params = querystring)
+            except KeyError:
+                continue
 
             print('json')
             # Transcribe to json
-            audio_json = speech2text.Speech2Text()
+            file_handler_audio.write(audio_file.content)
+            speech2text.Speech2Text(file_handler_json)
+
+            print('keyword detection')
+            # Keyword detection - /!\ Does not work yet
+            # if keywordDetector.detect_keywords('tmp.json') == False:
+            #    continue
 
             print('google drive')
-            # Upload to Google Drive
-            #googledrive.uploadFile(audio_file.content, 'final.mp3', 'audio/*')
-            #googledrive.uploadFile(audio_json, 'final.json', 'application/json')
+            # Upload to Google Drive - /!\ works, but is not needed anymore
+            # googledrive.uploadFile('tmp.mp3', 'final.mp3', 'audio/*', googledrive.TO_JOIN_FOLDER_ID)
+            # googledrive.uploadFile('tmp.json', 'final.json', 'application/json', googledrive.TO_DECIDE_FOLDER_ID)
+
+            print ('Trello card creation')
+            # Create Trello card - /!\ Does not work yet
+            date = datetime.utcfromtimestamp(int(message['ts'])).strftime('%Y-%m-%d %H:%M:%S')
+            card_name = message['sender']+' à '+message['recipient']+' - '+date
+            zello_members = [message['sender'], message['recipient']]
+            trello.createCardWithAttachment(card_name, zello_members, audio_file.content)
+
             params['start_id'] = message['id']
+
+            # Remove the following break once the above logic works
             break
+        # Remove the following break once the above logic works
         break
 except KeyboardInterrupt:
     last_message_id.saveLastMessageId(params['start_id'])
     print('interrupted')
 
-file_handler.close()
+file_handler_audio.close()
+file_handler_json.close()

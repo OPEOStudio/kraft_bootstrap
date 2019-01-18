@@ -12,7 +12,7 @@ from google.cloud.speech import types
 # Instantiates a client
 client = speech.SpeechClient()
 
-def Speech2Text():
+def Speech2Text(json_file):
     """transcribes an audio into a json file"""
 
     sound = AudioSegment.from_file('tmp.mp3', format="mp3", channels=1)
@@ -27,13 +27,11 @@ def Speech2Text():
     # Detects speech in the audio file
     response = client.recognize(config, audio)
 
-    print('Speech2Text START')
-    for result in response.results:
-        print(u'Transcript: {}'.format(result.alternatives[0].transcript))
-    print('Speech2Text END')
-
     data = {}
     data['file_name'] = 'audio.ogg'
-    data['transcript'] = '{}'.format(result.alternatives[0].transcript)
+    # Change this...
+    for result in response.results:
+        data['body'] = '{}'.format(result.alternatives[0].transcript)
+        break
 
-    return data
+    json.dump(data, json_file, indent=4, sort_keys=False)

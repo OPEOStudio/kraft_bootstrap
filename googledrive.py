@@ -2,13 +2,16 @@ from __future__ import print_function
 import pickle
 import os.path
 from googleapiclient.discovery import build
+import googleapiclient.http
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
 
 class GoogleDrive:
+    TO_JOIN_FOLDER_ID = '19mLU1ID_S4jNxdXfHWMcKBAyDKDC5QyV'
+    TO_DECIDE_FOLDER_ID = '1zYVgfPLf3QR_Ujc-meJdQt35O38C6cd-'
+    SCOPES = ['https://www.googleapis.com/auth/drive']
 
     def __init__(self):
         self.service = self.authenticate()
@@ -29,7 +32,7 @@ class GoogleDrive:
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', SCOPES)
+                    'credentials.json', self.SCOPES)
                 creds = flow.run_local_server()
             # Save the credentials for the next run
             with open('token.pickle', 'wb') as token:
@@ -37,9 +40,10 @@ class GoogleDrive:
 
         return build('drive', 'v3', credentials=creds)
 
-    def uploadFile(self, file_data, final_file_name, mimetype = 'application/octet-stream'):
-        print('upload to Google')
-        file_metadata = {'name': final_file_name}
-        media = MediaInMemoryUpload(file_data, mimetype=mimetype)
+    def uploadFile(self, file_path, file_name, mimetype = 'application/octet-stream', directory = ''):
+        file_metadata = {
+            'name': file_name,
+            'parents': [directory]
+            }
+        media = googleapiclient.http.MediaFileUpload(file_path, mimetype=mimetype)
         file = self.service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-        print('File ID: %s' % file.get('id'))

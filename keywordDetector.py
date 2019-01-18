@@ -5,7 +5,7 @@ import shutil
 import ntpath
 
 # define a list of keywords
-keywords = ('carte', 'cartes', 'nouvelle carte', 'nouvelles cartes',
+keywords = ('âllo','carte', 'cartes', 'nouvelle carte', 'nouvelles cartes',
             'ticket', 'tickets', 'nouveau ticket', 'nouveaux tickets')
 
 # Directories
@@ -17,13 +17,8 @@ TO_DIRECTORY_AUDIO = "TO_DIRECTORY_AUDIO"
 def detect_keywords(file_name):
     """ Detects if a file contains trigger keywords """
 
-    file_path = os.path.join(
-                    os.path.dirname(__file__),
-                    FROM_DIRECTORY_JSON,
-                    file_name)
-
     # Open the json file
-    with open(file_path) as json_file:
+    with open(file_name) as json_file:
 
         # read json file
         json_dict = json.loads(json_file.read())
@@ -106,7 +101,7 @@ def newFileScanner():
 
 
 if __name__ == '__main__':
-    
+
     # Scan new incoming files
     newFileScanner()
 
@@ -114,4 +109,3 @@ if __name__ == '__main__':
 
 
 
-    
