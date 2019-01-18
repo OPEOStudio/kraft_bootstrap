@@ -32,10 +32,12 @@ except ImportError:
     from urllib.parse import urlencode
 import os
 import urllib
+import tempfile
 import requests
 import zello_api_connect
 import last_message_id
 import googledrive
+import speech2text
 from password_hasher import hash_md5
 from print_request import print_r
 
@@ -123,7 +125,9 @@ params['start_id'] = start_id
 
 del params['max']
 
-googledrive_api = googledrive_authentication.authenticate();
+googledrive = googledrive.GoogleDrive();
+
+file_handler = open('tmp.mp3', 'wb')
 
 try:
     while 1:
@@ -135,13 +139,36 @@ try:
             continue
         print(messages[0])
 
-        del messages[0]
+        if start_id != 0:
+            del messages[0]
 
         # upload mp3 to TO JOIN folder in Google Docs
         # translate with google speech api to text in json,
+        print('in messages')
         for message in messages:
+
+            print('download mp3')
+            # Download mp3
+            url_media = url + "/history/getmedia/key/" + message['media_key']
+            request_media = requests.get(url_media, params = querystring)
+            request_media_dict = json.loads(request_media.text)
+            audio_file = requests.get(request_media_dict['url'], data = {}, params = querystring)
+
+            file_handler.write(audio_file.content)
+
+            print('json')
+            # Transcribe to json
+            audio_json = speech2text.Speech2Text()
+
+            print('google drive')
+            # Upload to Google Drive
+            #googledrive.uploadFile(audio_file.content, 'final.mp3', 'audio/*')
+            #googledrive.uploadFile(audio_json, 'final.json', 'application/json')
             params['start_id'] = message['id']
-            googledrive.upload();
+            break
+        break
 except KeyboardInterrupt:
     last_message_id.saveLastMessageId(params['start_id'])
     print('interrupted')
+
+file_handler.close()
