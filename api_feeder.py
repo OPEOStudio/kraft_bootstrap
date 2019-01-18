@@ -89,9 +89,6 @@ querystring = {"sid":sid}
 # Define the Response object
 response = requests.request("POST", url_login, data = payload, headers = headers, params = querystring)
 
-### Print the request object for dev purposes
-print_r("POST", url_login, data = payload, headers = headers, params = querystring)
-
 url_metadata = url + "/history/getmetadata"
 
 ## Last ID

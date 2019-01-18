@@ -18,7 +18,7 @@ def detect_keywords(file_name):
     """ Detects if a file contains trigger keywords """
 
     # Open the json file
-    with open(file_name) as json_file:
+    with open(file_path) as json_file:
 
         # read json file
         json_dict = json.loads(json_file.read())

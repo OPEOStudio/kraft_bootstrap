@@ -55,5 +55,3 @@ class TrelloAPI:
             except KeyError:
                 continue
         return None
-
-trello = TrelloAPI()
