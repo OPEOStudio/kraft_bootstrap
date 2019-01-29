@@ -35,9 +35,3 @@ def gettoken_zello(url, headers):
 	sid = response_dict["sid"]
 
 	return response_dict
-
-response_connect = gettoken_zello(url = url, headers = headers)
-
-print(response_connect)
-print("token : " + response_connect["token"])
-print("sid : " + response_connect["sid"])

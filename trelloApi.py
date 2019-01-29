@@ -24,11 +24,13 @@ class TrelloAPI:
                 }
         url = "https://api.trello.com/1/boards/"+BOARD_SODAPEM+"/members"
         response = requests.get(url, params=querystring)
+        print(response.text)
         return json.loads(response.text)
 
     def createCardWithAttachment(self, card_name, zello_users, file_data):
         id_members = ""
         for user in zello_users:
+            print(user)
             id = self.getBoardMemberIdByZelloUsername(user)
             if id != None:
                 if id_members != "":
@@ -39,19 +41,18 @@ class TrelloAPI:
             "name":card_name,
             "idList": LIST_TEAM_1_NOUVEAU,
             "idMembers":id_members,
-            "fileSource":file_data,
             "key": os.environ['TRELLO_API_KEY'],
             "token": os.environ['TRELLO_API_SECRET']
             }
         url = "https://api.trello.com/1/cards"
-
-        return requests.post(url, params=querystring)
+        print(querystring)
+        return requests.post(url, params=querystring, files={'fileSource': ('audio.mp3', file_data)})
 
     def getBoardMemberIdByZelloUsername(self, zello_name):
         for member in self.board_members:
             try:
                 if member['username'] == self.zello_to_trello_usernames[zello_name]:
-                    return member.id
+                    return member['id']
             except KeyError:
                 continue
         return None

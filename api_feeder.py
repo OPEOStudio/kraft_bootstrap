@@ -65,23 +65,16 @@ gettoken_response = zello_api_connect.gettoken_zello(url = url_gettoken, headers
 token = gettoken_response["token"]
 sid = gettoken_response["sid"]
 
-print("token : " + token)
-print("sid : " + sid)
-print(" ")
-
 ### -----------------------------
 ### GETS md5(md5(Zello admin account password) + {token} + {API Key})
 pre_h_pswd = Zello_admin_password_md5 + token + API_key
-print("Pre md5 hash password : " + pre_h_pswd)
 
 h_pswd = hash_md5(pre_h_pswd)
-print("md5(md5(Zello admin account password) + token + API Key) = " + h_pswd)
 
 ### -----------------------------
 ### DEFINE THE LOGIN REQUEST
 # Define the payload associated with the request
 payload = "username=Admin&password="+h_pswd
-print("payload : " + payload)
 
 # Define the sid to be included in the API url request
 querystring = {"sid":sid}
@@ -113,8 +106,6 @@ del params['max']
 googledrive = googledrive.GoogleDrive();
 trello = trelloApi.TrelloAPI()
 
-file_handler_audio = open('tmp.mp3', 'wb')
-file_handler_json = open('tmp.json', 'w+')
 
 try:
     while 1:
@@ -124,29 +115,45 @@ try:
 
         if len(messages) <= 1:
             continue
-        print(messages[0])
 
         if start_id != 0:
             del messages[0]
 
-        # upload mp3 to TO JOIN folder in Google Docs
-        # translate with google speech api to text in json,
+        print(messages[0]['id'])
         for message in messages:
+            file_handler_audio = open('tmp.mp3', 'w+b')
+            file_handler_json = open('tmp.json', 'w+')
 
             print('download mp3')
             # Download mp3
             url_media = url + "/history/getmedia/key/" + message['media_key']
             request_media = requests.get(url_media, params = querystring)
             request_media_dict = json.loads(request_media.text)
+            try_nb = 5
             try:
+                while (request_media_dict['status'] == 'Waiting' and try_nb > 0):
+                    request_media = requests.get(url_media, params = querystring)
+                    request_media_dict = json.loads(request_media.text)
+                    try_nb -= 1
+                params['start_id'] = message['id']
+
+                if (request_media_dict['status'] == 'Waiting'):
+                    raise ValueError('Could not download audio file from Zello')
+
                 audio_file = requests.get(request_media_dict['url'], data = {}, params = querystring)
-            except KeyError:
+            except ValueError as err:
+                print(err.args)
                 continue
+
 
             print('json')
             # Transcribe to json
             file_handler_audio.write(audio_file.content)
-            speech2text.Speech2Text(file_handler_json)
+            try:
+                speech2text.Speech2Text(file_handler_json)
+            except ValueError as err:
+                print(err.args)
+                continue
 
             print('keyword detection')
             # Keyword detection - /!\ Does not work yet
@@ -154,7 +161,7 @@ try:
             #    continue
 
             print('google drive')
-            # Upload to Google Drive - /!\ works, but is not needed anymore
+            # Upload to Google Drive - /!\ works, but is not needed anymore - if needed, file naming has to be implemented first
             # googledrive.uploadFile('tmp.mp3', 'final.mp3', 'audio/*', googledrive.TO_JOIN_FOLDER_ID)
             # googledrive.uploadFile('tmp.json', 'final.json', 'application/json', googledrive.TO_DECIDE_FOLDER_ID)
 
@@ -163,17 +170,16 @@ try:
             date = datetime.utcfromtimestamp(int(message['ts'])).strftime('%Y-%m-%d %H:%M:%S')
             card_name = message['sender']+' à '+message['recipient']+' - '+date
             zello_members = [message['sender'], message['recipient']]
-            trello.createCardWithAttachment(card_name, zello_members, audio_file.content)
 
-            params['start_id'] = message['id']
+            response = trello.createCardWithAttachment(card_name, zello_members, audio_file.content)
+            print(response.text)
 
-            # Remove the following break once the above logic works
-            break
-        # Remove the following break once the above logic works
-        break
+            file_handler_audio.truncate()
+            file_handler_audio.close()
+            file_handler_json.truncate()
+            file_handler_json.close()
+
 except KeyboardInterrupt:
     last_message_id.saveLastMessageId(params['start_id'])
     print('interrupted')
 
-file_handler_audio.close()
-file_handler_json.close()
