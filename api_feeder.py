@@ -133,6 +133,7 @@ try:
                     request_media_dict = json.loads(request_media.text)
                     try_nb -= 1
                 params['start_id'] = message['id']
+                last_message_id.saveLastMessageId(params['start_id'])
 
                 if (request_media_dict['status'] == 'Waiting'):
                     raise ValueError('Could not download audio file from Zello')
@@ -174,7 +175,7 @@ try:
             file_handler_json.truncate()
             file_handler_json.close()
 
-except KeyboardInterrupt:
+except:
     last_message_id.saveLastMessageId(params['start_id'])
     print('interrupted')
 
