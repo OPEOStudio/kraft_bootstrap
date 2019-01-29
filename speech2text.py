@@ -1,6 +1,5 @@
 import io
 import os
-import time
 import json
 from pydub import AudioSegment
 
@@ -22,9 +21,9 @@ def Speech2Text(json_file):
     sound.export("audio.ogg",format="ogg")
     sound = AudioSegment.from_ogg('audio.ogg')
 
-    storage_client.uploadFile(sound._data)
+    gs_name = storage_client.uploadFile(sound._data)
 
-    audio = types.RecognitionAudio(uri="gs://kraaft-bootstrap/audio.ogg")
+    audio = types.RecognitionAudio(uri="gs://kraaft-bootstrap/"+gs_name)
     config = types.RecognitionConfig(
                 encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
                 sample_rate_hertz=32000,
@@ -32,16 +31,20 @@ def Speech2Text(json_file):
 
     # Detects speech in the audio file
 #    try:
-    response = speech_client.long_running_recognize(config, audio)
+    response = speech_client.recognize(config, audio)
 
-    print(response)
- #   data = {}
- #   data['file_name'] = 'audio.ogg'
+#    result = response.result(timeout=600)
+    results = response.results
+    print(results)
+    data = {}
     # Change this...
- #   for result in response.results:
- #       data['body'] = '{}'.format(result.alternatives[0].transcript)
- #       break
+    for result in results:
+        for alternative in result.alternatives:
+            data['file_name'] = 'audio.ogg'
+            data['body'] = '{}'.format(alternative.transcript)
+            break
+        break
 
- #   json.dump(data, json_file, indent=4, sort_keys=False)
+    return data
 #    except:
-#        print('Error with speech to text')
+#        raise ValueError('Error with speech to text')

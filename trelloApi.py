@@ -24,7 +24,6 @@ class TrelloAPI:
                 }
         url = "https://api.trello.com/1/boards/"+BOARD_SODAPEM+"/members"
         response = requests.get(url, params=querystring)
-        print(response.text)
         return json.loads(response.text)
 
     def createCardWithAttachment(self, card_name, zello_users, file_data):

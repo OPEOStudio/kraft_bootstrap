@@ -5,7 +5,7 @@ import shutil
 import ntpath
 
 # define a list of keywords
-keywords = ('âllo','carte', 'cartes', 'nouvelle carte', 'nouvelles cartes',
+keywords = ('carte', 'cartes', 'nouvelle carte', 'nouvelles cartes',
             'ticket', 'tickets', 'nouveau ticket', 'nouveaux tickets')
 
 # Directories
@@ -14,33 +14,20 @@ FROM_DIRECTORY_AUDIO = "FROM_DIRECTORY_AUDIO"
 TO_DIRECTORY_AUDIO = "TO_DIRECTORY_AUDIO"
 
 
-def detect_keywords(file_name):
+def detect_keywords(json_dict):
     """ Detects if a file contains trigger keywords """
-
-    # Open the json file
-    with open(file_path) as json_file:
-
-        # read json file
-        json_dict = json.loads(json_file.read())
-        
+    print(json_dict)
+    try:
         # check if "body" (lowercased) contains any of the keywords
         if any(keyword in json_dict["body"].lower() for keyword in keywords):
-
-            # Print the detected keyword
-            print('A keyword has been detected in {} 🔑'.format(file_name))
-
-            # Return
+            print('A keyword has been detected')
             return True
-
         else:
-
-            # Print there is no detected keyword
-            print('Could not fin any keyword in {} 🤷‍♀️'.format(file_name))
-
-            # Return
+            print('Could not find any keyword')
             return False
-
-
+    except KeyError:
+        print('Could not find any keyword')
+        return False
 
 def transfer_file(file_name):
     """ Transfere a json file from FROM_DIRECTORY_AUDIO to TO_DIRECTORY_AUDIO """

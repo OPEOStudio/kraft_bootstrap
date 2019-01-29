@@ -1,4 +1,3 @@
-
 # Zello API at https://zellowork.com/api.htm#auth_section
 
 # Takes as INPUT:
@@ -22,8 +21,6 @@
 
 # I need to get inspiration from https://www.digitalocean.com/community/tutorials/how-to-use-web-apis-in-python-3
 # for further coding
-
-print(" ")
 
 import json
 try:
@@ -150,20 +147,18 @@ try:
             # Transcribe to json
             file_handler_audio.write(audio_file.content)
             try:
-                speech2text.Speech2Text(file_handler_json)
+                json_dict = speech2text.Speech2Text(file_handler_json)
             except ValueError as err:
                 print(err.args)
+                continue
+            except:
+                print('Unknown error in SpeechToText: the most frequent reason is an audio message which is over 1min long.')
                 continue
 
             print('keyword detection')
             # Keyword detection - /!\ Does not work yet
-            # if keywordDetector.detect_keywords('tmp.json') == False:
-            #    continue
-
-            print('google drive')
-            # Upload to Google Drive - /!\ works, but is not needed anymore - if needed, file naming has to be implemented first
-            # googledrive.uploadFile('tmp.mp3', 'final.mp3', 'audio/*', googledrive.TO_JOIN_FOLDER_ID)
-            # googledrive.uploadFile('tmp.json', 'final.json', 'application/json', googledrive.TO_DECIDE_FOLDER_ID)
+            if keywordDetector.detect_keywords(json_dict) == False:
+                continue
 
             print ('Trello card creation')
             # Create Trello card - /!\ Does not work yet
