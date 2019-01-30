@@ -11,7 +11,7 @@ class TrelloAPI:
     zello_to_trello_usernames = {
     "user_kraaft_1": "user_kraaft_1",
     "user_kraaft_2": "user_kraaft_2",
-    "kathy_g": "kathygreer"
+    "kathy_g": "kathygreer",
     }
 
     def __init__(self):
