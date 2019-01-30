@@ -37,10 +37,9 @@ def Speech2Text(json_file):
     results = response.results
     print(results)
     data = {}
-    # Change this...
+    data['body'] = '{}'
     for result in results:
         for alternative in result.alternatives:
-            data['file_name'] = 'audio.ogg'
             data['body'] = '{}'.format(alternative.transcript)
             break
         break

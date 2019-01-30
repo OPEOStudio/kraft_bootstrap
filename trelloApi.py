@@ -26,7 +26,7 @@ class TrelloAPI:
         response = requests.get(url, params=querystring)
         return json.loads(response.text)
 
-    def createCardWithAttachment(self, card_name, zello_users, file_data):
+    def createCardWithAttachment(self, card_name, zello_users, audio_data, text_data):
         id_members = ""
         for user in zello_users:
             print(user)
@@ -40,12 +40,13 @@ class TrelloAPI:
             "name":card_name,
             "idList": LIST_TEAM_1_NOUVEAU,
             "idMembers":id_members,
+            "desc": text_data,
             "key": os.environ['TRELLO_API_KEY'],
             "token": os.environ['TRELLO_API_SECRET']
             }
         url = "https://api.trello.com/1/cards"
         print(querystring)
-        return requests.post(url, params=querystring, files={'fileSource': ('audio.mp3', file_data)})
+        return requests.post(url, params=querystring, files={'fileSource': ('audio.mp3', audio_data)})
 
     def getBoardMemberIdByZelloUsername(self, zello_name):
         for member in self.board_members:

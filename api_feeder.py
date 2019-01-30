@@ -142,6 +142,8 @@ try:
             except ValueError as err:
                 print(err.args)
                 continue
+            except:
+                continue
 
 
             print('json')
@@ -167,7 +169,7 @@ try:
             card_name = message['sender']+' à '+message['recipient']+' - '+date
             zello_members = [message['sender'], message['recipient']]
 
-            response = trello.createCardWithAttachment(card_name, zello_members, audio_file.content)
+            response = trello.createCardWithAttachment(card_name, zello_members, audio_file.content, json_dict['body'])
             print(response.text)
 
             file_handler_audio.truncate()
