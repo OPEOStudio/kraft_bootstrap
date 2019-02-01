@@ -13,7 +13,7 @@ import googlestorage
 speech_client = speech.SpeechClient()
 storage_client = googlestorage.GoogleStorage()
 
-def Speech2Text(json_file):
+def Speech2Text():
 
     """transcribes an audio into a json file"""
 
@@ -30,12 +30,9 @@ def Speech2Text(json_file):
                 language_code='fr-FR')
 
     # Detects speech in the audio file
-#    try:
     response = speech_client.recognize(config, audio)
-
-#    result = response.result(timeout=600)
     results = response.results
-    print(results)
+
     data = {}
     data['body'] = '{}'
     for result in results:

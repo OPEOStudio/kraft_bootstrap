@@ -11,9 +11,13 @@ class TrelloAPI:
     zello_to_trello_usernames = {
     "user_kraaft_1": "user_kraaft_1",
     "user_kraaft_2": "user_kraaft_2",
+<<<<<<< HEAD
     "kathy_g": "kathygreer",
     "user_kraaft_3": "user_kraaft_3"
     "Hermione Granger": "user_kraaft_4"
+=======
+    "kathy_g": "kathygreer"
+>>>>>>> 0311adeeaffcb6a1af963df6426523567a1d6f92
     }
 
     def __init__(self):
@@ -31,7 +35,6 @@ class TrelloAPI:
     def createCardWithAttachment(self, card_name, zello_users, audio_data, text_data):
         id_members = ""
         for user in zello_users:
-            print(user)
             id = self.getBoardMemberIdByZelloUsername(user)
             if id != None:
                 if id_members != "":
@@ -47,7 +50,7 @@ class TrelloAPI:
             "token": os.environ['TRELLO_API_SECRET']
             }
         url = "https://api.trello.com/1/cards"
-        print(querystring)
+
         return requests.post(url, params=querystring, files={'fileSource': ('audio.mp3', audio_data)})
 
     def getBoardMemberIdByZelloUsername(self, zello_name):
