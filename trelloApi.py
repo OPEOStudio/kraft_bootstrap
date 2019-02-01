@@ -12,6 +12,8 @@ class TrelloAPI:
     "user_kraaft_1": "user_kraaft_1",
     "user_kraaft_2": "user_kraaft_2",
     "kathy_g": "kathygreer",
+    "user_kraaft_3": "user_kraaft_3"
+    "Hermione Granger": "user_kraaft_4"
     }
 
     def __init__(self):
