@@ -9,11 +9,25 @@ BOARD_SODAPEM = 'c2sq0A0u'
 
 class TrelloAPI:
     zello_to_trello_usernames = {
-    "user_kraaft_1": "user_kraaft_1",
-    "user_kraaft_2": "user_kraaft_2",
+    "Franck Lisle":"user_kraaft_1",
+    "Sebastien Gipulo":"user_kraaft_2",
+    "David Rondelli":"user_kraaft_3",
+    "Elie Aguer":"user_kraaft_4",
+    "Pierre Brantome":"user_kraaft_5",
+    "Fabien Lepied ":"user_kraaft_6",
+    "David Cases":"user_kraaft_7",
+    "Sebastien Croullebois":"user_kraaft_8",
+    "Christophe Chapelle":"user_kraaft_9",
+    "Bruno Leclerc":"user_kraaft_18",
+    "Etienne Pugin":"user_kraaft_11",
+    "Clement Genest":"user_kraaft_12",
+    "Nicolas Poncon":"user_kraaft_13",
+    "Francois Guidicelli":"user_kraaft_14",
+    "Emmanuel Roberton":"user_kraaft_15",
+    "Philippe Savelli":"user_kraaft_16",
+    "Veronique Tournier":"user_kraaft_17",
     "kathy_g": "kathygreer",
-    "user_kraaft_3": "user_kraaft_3",
-    "Hermione Granger": "user_kraaft_4"
+    "admin":"adm_kr_poc"
     }
 
     def __init__(self):
