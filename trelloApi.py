@@ -12,7 +12,7 @@ class TrelloAPI:
     "Franck Lisle":"flisle",
     "Sebastien Gipulo":"user_kraaft_2",
     "David Rondelli":"user_kraaft_3",
-    "Elie Aguer":"user_kraaft_4",
+    "Veronique Tournier":"user_kraaft_4",
     "Pierre Brantome":"user_kraaft_19",
     "Fabien Lepied ":"user_kraaft_6",
     "David Cases":"user_kraaft_7",
@@ -25,7 +25,7 @@ class TrelloAPI:
     "Francois Guidicelli":"user_kraaft_14",
     "Yves Nurmohamed":"user_kraaft_15",
     "Philippe Savelli":"user_kraaft_16",
-    "Veronique Tournier":"user_kraaft_17",
+    "Elie Aguer":"user_kraaft_17",
     "kathy_g": "kathygreer",
     "admin":"adm_kr_poc"
     }
