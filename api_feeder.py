@@ -112,61 +112,63 @@ try:
 
             print('download mp3')
             # Download mp3
-            url_media = ZELLO_URL_MEDIA + message['media_key']
-            request_media = requests.get(url_media, params = querystring)
-            request_media_dict = json.loads(request_media.text)
-            try_nb = 5
-            try:
-                while (request_media_dict['status'] == 'Waiting' and try_nb > 0):
-                    request_media = requests.get(url_media, params = querystring)
-                    request_media_dict = json.loads(request_media.text)
-                    try_nb -= 1
-                params['start_id'] = message['id']
-                last_message_id.saveLastMessageId(params['start_id'])
+            if message['type'] != 'call_alert': # if call alert, no field
+                url_media = ZELLO_URL_MEDIA + message['media_key']
+                request_media = requests.get(url_media, params = querystring)
+                request_media_dict = json.loads(request_media.text)
+                
+                try_nb = 5
+                try:
+                    while (request_media_dict['status'] == 'Waiting' and try_nb > 0):
+                        request_media = requests.get(url_media, params = querystring)
+                        request_media_dict = json.loads(request_media.text)
+                        try_nb -= 1
+                    params['start_id'] = message['id']
+                    last_message_id.saveLastMessageId(params['start_id'])
 
-                if (request_media_dict['status'] == 'Waiting'):
-                    raise ValueError('Could not download audio file from Zello')
+                    if (request_media_dict['status'] == 'Waiting'):
+                        raise ValueError('Could not download audio file from Zello')
 
-                audio_file = requests.get(request_media_dict['url'], data = {}, params = querystring)
-            except ValueError as err:
-                print(err.args)
-                continue
-            except:
-                continue
+                    audio_file = requests.get(request_media_dict['url'], data = {}, params = querystring)
+                except ValueError as err:
+                    print(err.args)
+                    continue
+                except:
+                    continue
 
 
-            print('json')
-            # Transcribe to json
-            file_handler_audio.write(audio_file.content)
-            try:
-                json_dict = speech2text.Speech2Text()
-            except ValueError as err:
-                print(err.args)
-                continue
-            except:
-                print('Unknown error in SpeechToText: the most frequent reason is an audio message which is over 1min long.')
-                continue
+                print('json')
+                # Transcribe to json
+                file_handler_audio.write(audio_file.content)
+                try:
+                    json_dict = speech2text.Speech2Text()
+                except ValueError as err:
+                    print(err.args)
+                    continue
+                except:
+                    print('Unknown error in SpeechToText: the most frequent reason is an audio message which is over 1min long.')
+                    continue
 
-            print('keyword detection')
-            # Keyword detection - /!\ Does not work yet
-            if keywordDetector.detect_keywords(json_dict) == False:
-                continue
+                print('keyword detection')
+                # Keyword detection - /!\ Does not work yet
+                if keywordDetector.detect_keywords(json_dict) == False:
+                    continue
 
-            print ('Trello card creation')
-            # Create Trello card - /!\ Does not work yet
-            date = datetime.utcfromtimestamp(int(message['ts'])).strftime('%Y-%m-%d %H:%M:%S')
-            card_name = message['sender']+' à '+message['recipient']+' - '+date
-            zello_members = [message['sender'], message['recipient']]
+                print ('Trello card creation')
+                # Create Trello card - /!\ Does not work yet
+                date = datetime.utcfromtimestamp(int(message['ts'])).strftime('%Y-%m-%d %H:%M:%S')
+                card_name = message['sender']+' à '+message['recipient']+' - '+date
+                zello_members = [message['sender'], message['recipient']]
 
-            trello_response = trello.createCardWithAttachment(card_name, zello_members, audio_file.content, json_dict['body'])
-            trello_dict = json.loads(trello_response.text)
+                trello_response = trello.createCardWithAttachment(card_name, zello_members, audio_file.content, json_dict['body'])
+                trello_dict = json.loads(trello_response.text)
 
-            # In log file: Zello ID, Sender, Recipient, Date, Trello ID, Message Text
-            log =  str(message['id']) + "," + message['sender'] + "," + message['recipient'] + "," + date + "," + str(trello_dict['idShort']) + "," + json_dict['body']+"\n"
-            messages_handler.write(log)
+                # In log file: Zello ID, Sender, Recipient, Date, Trello ID, Message Text
+                log =  str(message['id']) + "," + message['sender'] + "," + message['recipient'] + "," + date + "," + str(trello_dict['idShort']) + "," + json_dict['body']+"\n"
+                messages_handler.write(log)
 
-            file_handler_audio.truncate()
-            file_handler_audio.close()
+                file_handler_audio.truncate()
+                file_handler_audio.close()
 
 except:
     last_message_id.saveLastMessageId(params['start_id'])
