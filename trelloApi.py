@@ -10,6 +10,7 @@ BOARD_SODAPEM = 'c2sq0A0u'
 class TrelloAPI:
     zello_to_trello_usernames = {
     "Franck Lisle":"flisle",
+    "Yannick Lecun":"user_kraaft_1",
     "Sebastien Gipulo":"user_kraaft_2",
     "David Rondelli":"user_kraaft_3",
     "Veronique Tournier":"user_kraaft_4",
